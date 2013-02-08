@@ -1,0 +1,170 @@
+% Autor: Mateus Ferreira SIlva <mtsferreirasilva@gmail.com>
+% Data: Outubro de 2012
+
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{textcomp}
+\usepackage[brazil]{babel}
+\usepackage[pdftex]{graphicx}   
+\usepackage{csvtools}
+\usepackage{fancyhdr}
+\usepackage{multicol}
+\usepackage{ifthen, xspace}
+\usepackage[usenames,svgnames,dvipsnames,table]{xcolor}
+\usepackage[none]{hyphenat} 
+\usepackage{setspace}
+\usepackage{wallpaper}
+\usepackage[vcentering,landscape,a4paper,
+            top=1.4cm,bottom=0.1cm,
+            left=1.7cm,right=3.0cm]{geometry}
+            
+%\ThisLRCornerWallPaper{0.5}{imagens/Tux.png}
+%\LRCornerWallPaper{0.5}{imagens/Tux.png}
+
+\newcommand\BackgroundPicture{%
+   \put(0,0){%
+     \parbox[b][\paperheight]{\paperwidth}{%
+       \vfill
+       \centering
+       \includegraphics[]{imagens/background.png}%
+       \vfill
+     }}}
+
+
+\renewcommand{\rmdefault}{phv} % Arial
+\renewcommand{\sfdefault}{phv} % Arial
+            
+\newcounter{alunos}
+\applyCSVfile{editaveis/lista-participantes.csv}{%
+\stepcounter{alunos}
+\csvSaveEntry{NOMEPARTICIPANTE}
+\csvSaveEntry{TEMA}
+\csvSaveEntry{REPOSITORIO}
+}
+
+% Definições para o fancyhdr
+\lhead{}
+\chead{}
+\rhead{}
+\renewcommand{\headrule}{\color{white}}
+\pagestyle{empty}
+
+\def\certainlynotintoks{\certainlynotintoks}
+\def\iftoksempty#1{\expandafter\ifx\expandafter
+    \certainlynotintoks\the#1 \certainlynotintoks}
+
+\AddToShipoutPicture{\BackgroundPicture}	
+
+% Documento
+\begin{document}
+		%Contador para o arquivo lista-participantes.csv
+		\newcounter{certificado}
+		\whiledo{\value{certificado}<\value{alunos}}{%
+		\stepcounter{certificado}
+		
+		%Captura o CSV		
+		\def\tema{\protect\csvGetEntry{certificado}{TEMA}}
+		\def\repositorio{\protect\csvGetEntry{certificado}{REPOSITORIO}}
+		\def\nomeparticipante{\protect\csvGetEntry{certificado}{NOMEPARTICIPANTE}}
+	
+		\doublespacing
+		\noindent
+		
+		%Frente-----------------------------
+		\begin{minipage}{\textwidth}
+			\includegraphics[width=\textwidth]{imagens/header.png}
+	
+			\vspace{0.1cm} 
+			
+			\begin{center}
+				{\resizebox{!}{1.5cm}{Certificado}}\\
+				\bigskip
+				\bigskip
+			\end{center}
+			
+			\begin{center}
+				\begin{minipage}{1\textwidth}
+					%Texto do certificado
+					
+				\setbox0=\hbox{\tema}\ifdim\wd0=0pt
+					{\Large O Instituto Federal de Educação, Ciência e Tecnologia do Sudeste de Minas Gerais - Campus Barbacena certifica que \textbf{\nomeparticipante} ministrou o curso}
+				\else
+					{\Large O Instituto Federal de Educação, Ciência e Tecnologia do Sudeste de Minas Gerais - Campus Barbacena certifica que \textbf{\nomeparticipante} concluiu o curso}
+				\fi
+					\applyCSVfile{editaveis//dados-do-curso.csv}%
+					{\Large \textbf{{\insertNOMECURSO}}, com carga horária de {\insertHORAS} horas presenciais, realizado no período de {\insertDATAINICIO} a {\insertDATAFIM}, através do \textit{Projeto de Extensão Laboratório de Redes de Conhecimento}.}\\\\
+					{\Large Barbacena, {\insertDATAEMISSAO}.}\\
+				\end{minipage}
+			\end{center}
+			
+			\vspace{2.5cm}
+			\singlespacing 
+
+			\begin{multicols}{2}
+				%Campos para assinatura
+				\centering
+				\large {\rule{10.0cm}{0.5pt}\\
+				\setbox0=\hbox{\tema}\ifdim\wd0=0pt
+					{\insertRESPONSAVEL}\\
+					\large \textit{\textbf{Cordenador}}\\
+				\else
+					{\insertINSTRUTOR}\\
+					\large \textit{\textbf{Instrutor}}\\
+				\fi}
+				
+				\large {\rule{10.0cm}{0.5pt}\\
+				{\insertESCOLA}\\
+				\large	\textit{\textbf{Diretor de Extensão}}\\} 
+			\end{multicols}
+		
+			\singlespacing 
+			\singlespacing
+		
+			\includegraphics[width=\textwidth]{imagens/footer.png}
+			
+		\end{minipage}
+		
+		%Verso-----------------------------
+		\begin{minipage}{\textwidth}
+			
+			{\Large \textbf{EMENTA DO CURSO}\\}
+			
+			\setlength{\columnsep}{0.8cm}
+			\begin{minipage}{0.95\textwidth}
+			\begin{multicols}{3}	
+				\begin{flushleft}
+					%Arquivo de Ementa
+					{\small \input{EmentaFormatada.txt}}
+					\small
+				\end{flushleft}
+			\end{multicols}
+			\end{minipage}
+
+			\vspace{0.4cm} 
+			
+			%\ifthenelse{\equal{\tema}{\nil}}{IGUAL}{DESIGUAl}
+			
+			\setbox0=\hbox{\tema}\ifdim\wd0=0pt
+			\else
+			\begin{center}
+				
+				\begin{minipage}{1\textwidth}
+					{\large \textbf{Tema do trabalho prático final:} \tema.}
+				\end{minipage}
+				
+			\end{center}
+			
+			%\singlespacing 
+			
+			\begin{center}
+				\begin{minipage}{1\textwidth}
+					{\large \textbf{Repositório:} \repositorio}
+				\end{minipage}
+			\end{center}
+			
+			\fi
+		\end{minipage}			
+	}
+\end{document}
